@@ -1,0 +1,5 @@
+# Jangan upload file sensitif dan file hasil build
+.env
+node_modules/
+firebase-key.json
+.DS_Store
