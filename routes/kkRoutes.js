@@ -31,6 +31,15 @@ router.post("/store", async (req, res) => {
   const { nomorKK, alamat, anggotaKeluarga } = req.body;
 
   try {
+    // 🔍 Cek apakah data dengan nomorKK ini sudah ada di Firebase
+    const existingDoc = await db.collection("KartuKeluarga").doc(nomorKK).get();
+    if (existingDoc.exists) {
+        return res.status(400).json({
+            success: false,
+            message: "❌ Nomor KK sudah ada! Silahkan Buat Baru.",
+        });
+    }
+
     // Gabungkan & hash data
     const dataKK = JSON.stringify({ nomorKK, alamat, anggotaKeluarga });
     const hashKK = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(dataKK));
