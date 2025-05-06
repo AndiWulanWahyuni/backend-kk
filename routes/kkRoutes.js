@@ -28,7 +28,7 @@ console.log("Wallet Address:", wallet.address);
 
 // 🔹 1. Store KK
 router.post("/store", async (req, res) => {
-  const { nomorKK, alamat, anggotaKeluarga } = req.body;
+  const { statusDokumen, nomorKK, alamat, anggotaKeluarga, daerah, penandatangan, tanggalTtd } = req.body;
 
   try {
     // 🔍 Cek apakah data dengan nomorKK ini sudah ada di Firebase
@@ -41,14 +41,18 @@ router.post("/store", async (req, res) => {
     }
 
     // Gabungkan & hash data
-    const dataKK = JSON.stringify({ nomorKK, alamat, anggotaKeluarga });
+    const dataKK = JSON.stringify({ statusDokumen, nomorKK, alamat, anggotaKeluarga, daerah, penandatangan, tanggalTtd });
     const hashKK = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(dataKK));
 
     // Simpan ke Firebase
     await db.collection("KartuKeluarga").doc(nomorKK).set({
+      statusDokumen,
       nomorKK,
       alamat,
       anggotaKeluarga,
+      daerah,
+      penandatangan,
+      tanggalTtd,
       hashKK,
     });
     console.log("Data berhasil disimpan ke Firebase");
