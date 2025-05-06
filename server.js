@@ -7,8 +7,14 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const corsOptions = {
+  origin: "https://frontend-kk.vercel.app", // Ganti sesuai domain frontend
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+};
+
 // Middlewares
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // Routes
