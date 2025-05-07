@@ -204,4 +204,30 @@ router.put("/hapus-anggota/:nomorKK/:index", async (req, res) => {
   }
 });
 
+// 🔹 5. List semua data KK
+router.get("/list", async (req, res) => {
+  try {
+    const snapshot = await db.collection("KartuKeluarga").get();
+
+    const data = snapshot.docs.map((doc) => {
+      const kk = doc.data();
+      return {
+        nomorKK: kk.nomorKK,
+        alamat: kk.alamat,
+        statusDokumen: kk.statusDokumen,
+        daerah: kk.daerah,
+        penandatangan: kk.penandatangan,
+        tanggalTtd: kk.tanggalTtd,
+        anggotaKeluarga: kk.anggotaKeluarga,
+        hashKK: kk.hashKK,
+      };
+    });
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error("❌ Gagal mengambil data KK:", error);
+    res.status(500).json({ success: false, message: "Gagal mengambil data", error: error.message });
+  }
+});
+
 module.exports = router;
