@@ -149,62 +149,7 @@ router.put("/update/:nomorKK", async (req, res) => {
   }
 });
 
-// 🔹 4. Hapus anggota keluarga berdasarkan index
-router.put("/hapus-anggota/:nomorKK/:index", async (req, res) => {
-  const { nomorKK, index } = req.params;
-
-  try {
-    const docRef = db.collection("KartuKeluarga").doc(nomorKK);
-    const doc = await docRef.get();
-
-    if (!doc.exists) {
-      return res.status(404).json({ success: false, message: "Data tidak ditemukan" });
-    }
-
-    const kkData = doc.data();
-    const anggota = kkData.anggotaKeluarga || [];
-
-    if (index < 0 || index >= anggota.length) {
-      return res.status(400).json({ success: false, message: "Index tidak valid" });
-    }
-
-    // Hapus anggota sesuai index
-    anggota.splice(index, 1);
-
-    // Tanggal TTD diperbarui otomatis
-    const tanggalTtd = new Date().toISOString();
-
-    // Buat data baru + hash
-    const dataKKBaru = JSON.stringify({
-      statusDokumen: kkData.statusDokumen,
-      nomorKK,
-      alamat: kkData.alamat,
-      anggotaKeluarga: anggota,
-      daerah: kkData.daerah,
-      penandatangan: kkData.penandatangan,
-      tanggalTtd,
-    });
-    const hashKK = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(dataKKBaru));
-
-    // Simpan kembali
-    await docRef.update({
-      anggotaKeluarga: anggota,
-      tanggalTtd,
-      hashKK,
-    });
-
-    // Kirim hash ke blockchain
-    const tx = await contract.storeKK(nomorKK, hashKK);
-    await tx.wait();
-
-    res.json({ success: true, message: "Anggota berhasil dihapus", anggotaKeluarga: anggota, hashKK });
-  } catch (error) {
-    console.error("❌ Error hapus anggota:", error);
-    res.status(500).json({ success: false, message: "Gagal hapus anggota", error: error.message });
-  }
-});
-
-// 🔹 5. List semua data KK
+// 🔹 4. List semua data KK
 router.get("/list", async (req, res) => {
   try {
     const snapshot = await db.collection("KartuKeluarga").get();
