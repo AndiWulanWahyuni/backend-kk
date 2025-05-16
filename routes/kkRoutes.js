@@ -87,7 +87,7 @@ router.put("/update/:nomorKK", async (req, res) => {
     const hashKK = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(JSON.stringify(dataForHash)));
     kk.hashKK = hashKK;
 
-    await docRef.update({ ...kk });
+    await docRef.update(JSON.parse(JSON.stringify(kk)));
     const tx = await contract.storeKK(nomorKK, hashKK);
     await tx.wait();
 
