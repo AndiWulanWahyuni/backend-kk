@@ -75,7 +75,16 @@ router.put("/update/:nomorKK", async (req, res) => {
     kk.updateDataKK({ statusDokumen, alamat, daerah, penandatangan });
     kk.anggotaKeluarga = anggotaKeluarga;
     kk.tanggalTtd = new Date().toISOString();
-    const hashKK = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(JSON.stringify(kk)));
+    const dataForHash = {
+      statusDokumen: kk.statusDokumen,
+      nomorKK: kk.nomorKK,
+      alamat: kk.alamat,
+      anggotaKeluarga: kk.anggotaKeluarga,
+      daerah: kk.daerah,
+      penandatangan: kk.penandatangan,
+      tanggalTtd: kk.tanggalTtd
+    };
+    const hashKK = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(JSON.stringify(dataForHash)));
     kk.hashKK = hashKK;
 
     await docRef.update({ ...kk });
