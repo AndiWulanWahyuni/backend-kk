@@ -8,9 +8,11 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 const corsOptions = {
-  origin: "https://frontend-kk.vercel.app", // Ganti sesuai domain frontend
+  origin: [
+    "https://frontend-kk.vercel.app"
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
+  credentials: true,
 };
 
 // Middlewares
