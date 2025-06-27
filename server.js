@@ -25,7 +25,7 @@ app.use("/api/kk", kkRoutes);
 
 // Test Route
 app.get("/", (req, res) => {
-  res.send("✅ Backend berjalan di Railway!");
+  res.send("✅ Backend berjalan di Render!");
 });
 
 // Start server
