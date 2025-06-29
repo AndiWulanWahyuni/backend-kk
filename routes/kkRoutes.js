@@ -58,9 +58,9 @@ router.post("/verify", async (req, res) => {
       ethers.utils.toUtf8Bytes(JSON.stringify(dataToHash))
     );
 
-    const storedHash = await contract.getHash(nomorKK);
+    const storedHash = await contract.getKKHash(nomorKK);
 
-    if (currentHash !== storedHash) {
+    if (currentHash.toLowerCase() !== storedHash.toLowerCase()) {
       return res.json({
         success: false,
         message: "❌ Data tidak valid, telah dimodifikasi!",
@@ -77,6 +77,7 @@ router.post("/verify", async (req, res) => {
       data,
     });
   } catch (error) {
+    console.error("❌ Error verifikasi:", error);
     res.status(500).json({
       success: false,
       message: "❌ Error saat verifikasi",
