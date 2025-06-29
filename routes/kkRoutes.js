@@ -38,16 +38,50 @@ router.post("/verify", async (req, res) => {
   const { nomorKK } = req.body;
   try {
     const doc = await db.collection("KartuKeluarga").doc(nomorKK).get();
-    if (!doc.exists) return res.status(404).json({ success: false, message: "Data tidak ditemukan" });
+    if (!doc.exists) {
+      return res.status(404).json({ success: false, message: "❌ Data tidak ditemukan" });
+    }
 
-    const { hashKK } = doc.data();
-    const isValid = await contract.verifyKK(nomorKK, hashKK);
+    const data = doc.data();
 
-    if (!isValid) return res.json({ success: false, message: "Verifikasi gagal, data diubah!" });
+    const dataToHash = {
+      statusDokumen: data.statusDokumen,
+      nomorKK: data.nomorKK,
+      alamat: data.alamat,
+      anggotaKeluarga: data.anggotaKeluarga,
+      daerah: data.daerah,
+      penandatangan: data.penandatangan,
+      tanggalTtd: data.tanggalTtd
+    };
 
-    res.json({ success: true, message: "✅ Data valid", data: doc.data() });
+    const currentHash = ethers.utils.keccak256(
+      ethers.utils.toUtf8Bytes(JSON.stringify(dataToHash))
+    );
+
+    const storedHash = await contract.getHash(nomorKK);
+
+    if (currentHash !== storedHash) {
+      return res.json({
+        success: false,
+        message: "❌ Data tidak valid, telah dimodifikasi!",
+        detail: {
+          storedHash,
+          currentHash,
+        }
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "✅ Data valid dan tidak dimanipulasi",
+      data,
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: "❌ Error saat verifikasi", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "❌ Error saat verifikasi",
+      error: error.message,
+    });
   }
 });
 
